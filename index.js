@@ -27,6 +27,12 @@ Bots.set("pop", {
   stream: "https://streams.ilovemusic.de/iloveradio3.mp3",
   type: "Pop",
 });
+Bots.set("testing", {
+  token: process.env.testingToken,
+  channelId: "854044194779955267",
+  stream: "http://stream.laut.fm/lofi",
+  type: "testing",
+});
 
 async function joinChannel(channelId, stream, client) {
   const voiceJoiner = ora(`${client.user.tag} joining voice channel`);
@@ -66,9 +72,14 @@ async function joinChannel(channelId, stream, client) {
       voiceJoiner.fail(`${client.user.tag} failed to join`) + console.error(err)
     );
   }
+
+  setInterval(() => {
+    if (!channel.guild.members.cache.get(client.user.id).voice?.channelId)
+      joinChannel(channelId, stream, client);
+  }, 5000);
 }
 
-let bot = Bots.get("pop");
+let bot = Bots.get("testing");
 
 const botLoader = ora("Starting Discord.js Client").start();
 const client = new Client({
@@ -81,9 +92,13 @@ const client = new Client({
 });
 client.on("ready", async () => {
   setInterval(() => {
-    let dragon = ["AVIORA RADIO", "Coded By : Dragon,Ludho"];
-    let Power = Math.floor(Math.random() * dragon.length);
-    client.user.setActivity(dragon[Power], {
+    let activities = [
+      "AVIORA RADIO",
+      "Coded By : Dragon,Ludho",
+      `${bot.type} music`,
+    ];
+    let random = Math.floor(Math.random() * activities.length);
+    client.user.setActivity(activities[random], {
       type: "STREAMING",
       url: "https://www.twitch.tv/trikanoid",
     });

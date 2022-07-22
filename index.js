@@ -45,7 +45,7 @@ async function joinChannel(channelId, stream, client) {
         voiceJoiner.fail(`${client.user.tag} failed to destroy the player`);
         console.error(e);
       }
-      joinChannel(channel.id);
+      joinChannel(channel.id, stream, client);
     });
     voiceJoiner.succeed(`${client.user.tag} is now playing`);
   } catch (err) {

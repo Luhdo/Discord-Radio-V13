@@ -15,5 +15,5 @@ module.exports = {
       type: "Pop",
     },
   },
-  activities: ["AVIORA RADIO", "Coded By : Dragon,Ludho", `${bot.type} music`],
+  activities: ["AVIORA RADIO", "Coded By : Dragon,Ludho"],
 };

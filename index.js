@@ -8,31 +8,12 @@ const {
 const { Client, Intents } = require("discord.js");
 const ora = require("ora");
 
+const config = require("./config");
+
 let Bots = new Map();
-Bots.set("javan", {
-  token: process.env.javanToken,
-  channelId: "971373495558742078",
-  stream: "http://www.radiofaaz.com:8000/radiofaaz",
-  type: "Javan",
-});
-Bots.set("lofi", {
-  token: process.env.lofiToken,
-  channelId: "971373529658441738",
-  stream: "http://stream.laut.fm/lofi",
-  type: "Lofi",
-});
-Bots.set("pop", {
-  token: process.env.popToken,
-  channelId: "971373552769040444",
-  stream: "https://streams.ilovemusic.de/iloveradio3.mp3",
-  type: "Pop",
-});
-Bots.set("testing", {
-  token: process.env.testingToken,
-  channelId: "854044194779955267",
-  stream: "http://stream.laut.fm/lofi",
-  type: "testing",
-});
+for (let bt of Object.keys(config.bots)) {
+  Bots.set(bt, config.bots[bt]);
+}
 
 async function joinChannel(channelId, stream, client) {
   const voiceJoiner = ora(`${client.user.tag} joining voice channel`);
@@ -79,10 +60,11 @@ async function joinChannel(channelId, stream, client) {
   }, 5000);
 }
 
-let bot = Bots.get("testing");
+let data = Bots.get("lofi");
+if (!data) throw new Error("No bot found, use javan, lofi, pop or custom");
 
 const botLoader = ora("Starting Discord.js Client").start();
-const client = new Client({
+const bot = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -90,20 +72,16 @@ const client = new Client({
     Intents.FLAGS.GUILD_VOICE_STATES,
   ],
 });
-client.on("ready", async () => {
+bot.on("ready", async () => {
   setInterval(() => {
-    let activities = [
-      "AVIORA RADIO",
-      "Coded By : Dragon,Ludho",
-      `${bot.type} music`,
-    ];
+    let activities = config.activities;
     let random = Math.floor(Math.random() * activities.length);
-    client.user.setActivity(activities[random], {
+    bot.user.setActivity(activities[random], {
       type: "STREAMING",
-      url: "https://www.twitch.tv/trikanoid",
+      url: "https://www.twitch.tv/ludho_mp",
     });
   }, 10000);
-  botLoader.succeed(`${client.user.tag} 24/7 bot is online! `);
-  await joinChannel(bot.channelId, bot.stream, client);
+  botLoader.succeed(`${bot.user.tag} 24/7 bot is online! `);
+  await joinChannel(config.channelId, data.stream, bot);
 });
-client.login(bot.token);
+bot.login(config.token);
